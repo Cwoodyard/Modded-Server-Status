@@ -1,0 +1,7 @@
+// Config coded by v1p3r_hax
+{
+    "token": "bot token", // create a token via the developer portal discord has
+    "ip": "server IP", // enter the server IP 
+    "port": 25565,
+    "stopper": false // used for stopping the bot's online status
+}
