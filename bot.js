@@ -1,19 +1,18 @@
 /* Author: v1p3r_hax
 *  Description: A pourpose built discord bot to get the server status of the SMP server used in the streams
-*  Version: 1.0.0
+*  Version: 1.0.1
 */
 const discord = require('discord.js')
 const util = require('minecraft-server-util');
 const config = require('./config.json');
 const statBot = new discord.Client();
 
-const REFRESH_INTERVAL = 1 * 60 * 1000;
+const REFRESH_INTERVAL = 0.5 * 60 * 1000;
 
 statBot.on('ready', async() => {
     setDefaultStatus();
     console.log("Standing ready sire!");
     serverPingStat();
-    
 });
 
 function setDefaultStatus(){
@@ -23,7 +22,6 @@ function setDefaultStatus(){
 };
 
 async function serverPingStat(){
-    intervalId = statBot.setInterval(serverPingStat, REFRESH_INTERVAL);
     while(config.stopper == false){
         await util.status(config.ip, {port: config.port})
         .then((result) => {
@@ -35,7 +33,7 @@ async function serverPingStat(){
             console.log("WE GOING DOWN!");
             throw error;
         });
-        await new Promise(done => setTimeout(done, 5000));
+        await new Promise(done => setTimeout(done, REFRESH_INTERVAL));
     };
 };
 

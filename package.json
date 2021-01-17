@@ -1,6 +1,6 @@
 {
   "name": "viper-discord-bot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bot to Monitor the status of a Modded Minecraft server. Pourpose Built.",
   "main": "index.js",
   "scripts": {
