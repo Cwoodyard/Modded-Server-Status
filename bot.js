@@ -23,6 +23,7 @@ function setDefaultStatus(){
 
 async function serverPingStat(){
     while(config.stopper == false){
+        setDefaultStatus();
         await util.status(config.ip, {port: config.port})
         .then((result) => {
             statBot.user.setStatus("online");
