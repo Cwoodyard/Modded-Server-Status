@@ -1,16 +1,44 @@
-/* Author: v1p3r_hax
- *  Description: A pourpose built discord bot to get the server status of the SMP server used in the streams
- *  Version: 1.0.3
+/*  Author: v1p3r_hax
+ *  Authors Notes: The base.js and some of this code has been taken 
+    from https://github.com/AlexzanderFlores/Worn-Off-Keys-Discord-Js 
+    and should be aknowledged as so <3 to the original dev and their youtube tutorial
+ *  Description: A pourpose built discord bot to get the server 
+    status of the SMP server used in the streams
+ *  Version: 2.0.0
  */
 const discord = require('discord.js')
 const util = require('minecraft-server-util');
 const config = require('./config.json');
 const statBot = new discord.Client();
 
+//Added as part of WornOffKey's 25th vid
+const path = require('path');
+const fs = require('fs');
+
 statBot.on('ready', async() => {
     setDefaultStatus();
     console.log("Standing ready sire!");
-    //setting up a reoccuring check of the server to change the bot status
+
+    //Added as part of WornOffKey's 25th vid
+    const baseFile = 'base.js';
+    const commandBase = require(`./commands/${baseFile}`)
+    const readCommands = dir => {
+        const files = fs.readdirSync(path.join(__dirname, dir))
+        for (const file of files) {
+            const stat = fs.lstatSync(path.join(__dirname, dir, file))
+            if (stat.isDirectory()) {
+                readCommands(path.join(dir, file))
+            } else if (file !== baseFile) {
+                const option = require(path.join(__dirname, dir, file))
+                console.log(file, option)
+                commandBase(statBot, option, config)
+
+            }
+        }
+    }
+    readCommands('commands');
+
+    // setting up a reoccuring check of the server to change the bot status
     setInterval(function() {
         util.status(config.ip, { port: config.port })
             .then((result) => {
@@ -28,72 +56,5 @@ statBot.on('ready', async() => {
 function setDefaultStatus() {
     statBot.user.setStatus("online");
 };
-
-statBot.on('message', async message => {
-    // message.channel.send(message.content.slice(0, 2));
-
-    if (message.content.startsWith('v-')) {
-        switch (message.content.slice(2, message.content.length)) {
-            case 'status':
-                util.queryFull(config.ip, { port: config.port })
-                    .then((response) => {
-                        currPlayers = ' ';
-                        onlinePlaying = response.onlinePlayers;
-                        if (!onlinePlaying == 0) {
-                            currPlayers = response.players;
-                        } else {
-                            currPlayers = "Empty";
-                        };
-                        const Embed = new discord.MessageEmbed()
-                            .setTitle('Server Status')
-                            .addField('Server IP', response.host)
-                            .addField('Server Version', response.version)
-                            .addField('Online Players', response.onlinePlayers)
-                            .addField('Max Players', response.maxPlayers)
-                            .addField('Players', currPlayers)
-                        message.channel.send(Embed)
-                        console.log(response);
-                    })
-
-                .catch((error) => {
-                    message.channel.send("Server Denied the Request!");
-                    throw error;
-                })
-                break;
-
-            case 'MVSMPmodpack':
-                message.channel.send('Potion Shop Madness:\thttps://www.curseforge.com/minecraft/modpacks/potion-shop-madness');
-                break;
-
-            case 'FAmodpack':
-                message.channel.send("Mana's Fabric Adventures:\thttps://www.curseforge.com/minecraft/modpacks/manas-fabric-adventures");
-                break;
-
-            case 'check':
-                serverPingStat();
-                break;
-
-            case 'help':
-                message.channel.send('Complain To @ManaHakume#8416 and use https://www.google.com/');
-                break;
-
-            case 'commands':
-
-                const Embed2 = new discord.MessageEmbed()
-                    .setTitle('Commands')
-                    .addField('v-status', "Command to get the Fabric minecraft server status.")
-                    .addField('v-check', "Similar to v-status where it check to see of server is online.")
-                    .addField('v-MVSMPmodpack', "Where to download the Forge modpack.")
-                    .addField('v-FAmodpack', "Where to download the Fabric Modpack.")
-                    .addField('v-help', "What to do if you need help.")
-                    .addField('v-commands', "This prompt.")
-                message.channel.send(Embed2)
-                break;
-            default:
-                message.channel.send('invalid Command. Please type v-commands for the list of commands.')
-                break;
-        }
-    }
-});
 
 statBot.login(config.token);

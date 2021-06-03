@@ -1,6 +1,7 @@
 {
-    "token": "bot token", 
-    "ip": "server IP", 
+    "token": "bot token",
+    "ip": "server IP",
     "port": 25565,
-    "stopper": false 
+    "prefix": "v-",
+    "stopper": false
 }
